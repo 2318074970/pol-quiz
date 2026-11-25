@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>政治真题 · 分类刷题</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233E6753'/%3E%3Ctext x='16' y='23' font-size='15' text-anchor='middle' fill='%23FCF9F1' font-family='serif'%3E政%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<header class="top">
+  <nav class="crumb"><a href="../00_总入口.html">总入口</a><span class="sep">/</span><b>政治真题 · 分类刷题</b></nav>
+  <div class="hero">
+    <div class="brand"><span class="logo">政治</span><small>真题 · 分类刷题</small></div>
+    <div class="hero-stats">
+      <div class="hero-stat"><b id="stat-total">267</b><span>精选题</span></div>
+      <div class="hero-stat"><b id="stat-chap">43</b><span>知识点</span></div>
+      <div class="hero-stat"><b id="stat-year">10</b><span>年份</span></div>
+    </div>
+    <button class="theme-btn" id="theme-btn" type="button" title="切换护眼/夜间">◐ 夜间</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-mode="knowledge" type="button"><b>按知识点</b></button>
+    <button class="tab" data-mode="papers" type="button"><b>按年份套卷</b></button>
+    <button class="tab" data-mode="wrong" type="button"><b>错题本</b><span class="badge" id="badge-wrong">0</span></button>
+    <button class="tab" data-mode="review" type="button"><b>复习计划</b><span class="badge" id="badge-due">0</span></button>
+  </div>
+</header>
+
+<main class="main">
+  <aside class="rail" id="rail"></aside>
+  <section class="view" id="view"></section>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="p-top"><div class="p-top-in">
+    <button class="p-back" id="p-back" type="button">← 返回</button>
+    <div class="p-title" id="p-title"></div>
+    <div class="p-timer" id="p-timer" hidden></div>
+    <div class="p-count" id="p-count"></div>
+  </div></div>
+  <div class="p-main" id="p-main"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="./data/questions.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
