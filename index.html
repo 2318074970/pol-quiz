@@ -6,6 +6,13 @@
 <title>政治真题 · 分类刷题</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233E6753'/%3E%3Ctext x='16' y='23' font-size='15' text-anchor='middle' fill='%23FCF9F1' font-family='serif'%3E政%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="./app.css">
+<style>
+.src-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 22px;background:#F5EFE2;border-top:1px solid #E1D6C4;border-bottom:1px solid #E1D6C4;font-size:12.3px;color:#6B6254;line-height:1.6}
+.src-strip b{color:#4C5B4F;font-size:12.5px;white-space:nowrap}
+.src-strip a{border:1px solid #CFC3AE;background:#FCF8EF;border-radius:6px;padding:2px 8px;color:#5E564A;text-decoration:none;white-space:nowrap}
+.src-strip a:hover{border-color:#7B8B6B;background:#F4EDDD}
+@media(max-width:560px){.src-strip{padding:7px 12px}.src-strip a{font-size:11.5px}}
+</style>
 </head>
 <body>
 <header class="top">
@@ -25,6 +32,16 @@
     <button class="tab" data-mode="wrong" type="button"><b>错题本</b><span class="badge" id="badge-wrong">0</span></button>
     <button class="tab" data-mode="review" type="button"><b>复习计划</b><span class="badge" id="badge-due">0</span></button>
   </div>
+<div class="src-strip" id="srcStrip">
+  <b>徐涛700题源本</b>
+  <a data-rel="E:\27政治 徐涛\27优题库\27徐涛《优题库-试题基础篇》.pdf">试题基础</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27徐涛《优题库-解析基础篇》.pdf">解析基础</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27徐涛《优题库-试题拔高篇》.pdf">试题拔高</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27徐涛《优题库-解析拔高篇》.pdf">解析拔高</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27优题库基础篇做题本\【A4带空】27徐涛优题库基础篇做题本.pdf">A4 带空</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27优题库基础篇做题本\【A4紧凑】27徐涛优题库基础篇做题本.pdf">A4 紧凑</a>
+  <a data-rel="E:\27政治 徐涛\27优题库\27优题库基础篇做题本\【IPAD版】27徐涛优题库基础篇做题本.pdf">iPad</a>
+</div>
 </header>
 
 <main class="main">
@@ -46,5 +63,17 @@
 
 <script src="./data/questions.js"></script>
 <script src="./app.js"></script>
+<script>
+(function(){
+  var bar=document.getElementById('srcStrip');
+  if(!bar) return;
+  if(location.hostname.endsWith('github.io')){ bar.hidden=true; return; }
+  bar.querySelectorAll('a[data-rel]').forEach(function(a){
+    var p=a.getAttribute('data-rel');
+    a.href=encodeURI('file:///'+p.replace(/\\/g,'/').replace(/^\/+/, ''));
+    a.target='_blank'; a.rel='noopener';
+  });
+})();
+</script>
 </body>
 </html>

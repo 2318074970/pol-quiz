@@ -20,6 +20,30 @@
   D.questions.forEach(q => { byId[q.id] = q; });
   D.chapters.forEach(c => { chapterById[c.ch] = c; });
 
+  const CN_NUM = { 零: 0, 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+  function cnNumber(s) {
+    if (!s) return 0;
+    if (s === '十') return 10;
+    if (s.includes('十')) {
+      const p = s.split('十');
+      return (p[0] ? CN_NUM[p[0]] : 1) * 10 + (p[1] ? CN_NUM[p[1]] : 0);
+    }
+    return CN_NUM[s] || 0;
+  }
+  function chapterNo(c) {
+    const m = String(c && c.name || '').match(/^第([一二三四五六七八九十]+)章/);
+    return m ? cnNumber(m[1]) : 0;
+  }
+  function chapterLabel(c) {
+    const n = chapterNo(c);
+    return n ? '第' + n + '章' : (String(c && c.name || '').split(' ')[0] || '导论');
+  }
+  const MOD_ORDER = (D.meta.modules || []).map(m => m.name);
+  D.chapters.sort((a, b) => {
+    const ma = MOD_ORDER.indexOf(a.mod), mb = MOD_ORDER.indexOf(b.mod);
+    return (ma < 0 ? 99 : ma) - (mb < 0 ? 99 : mb) || chapterNo(a) - chapterNo(b) || Number(a.ch) - Number(b.ch);
+  });
+
   let store = { answers: {}, theme: 'light' };
   try {
     const raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
@@ -179,7 +203,7 @@
   function chapterCard(c) {
     const st = chapterStat(c);
     return `<article class="card">
-      <div class="card-top"><span class="num">第${esc(c.ch)}章</span><span class="tag ${['马原','新思想'].includes(c.mod) ? 'amber' : ''}">${esc(c.mod)}</span></div>
+      <div class="card-top"><span class="num">${esc(chapterLabel(c))}</span><span class="tag ${['马原','新思想'].includes(c.mod) ? 'amber' : ''}">${esc(c.mod)}</span></div>
       <h3>${esc(c.name)}</h3>
       <div class="meta"><span><b>${c.count}</b> 题</span><span>${c.years[0]}–${c.years[1]}</span><span>已做 <b>${st.seen}</b> / ${c.count}</span></div>
       <div class="pbar"><i style="width:${st.pct}%"></i></div>
@@ -243,11 +267,12 @@
       </div>`;
   }
 
-  function qTags(q) {
+  function qTags(q, withYear) {
+    const c = chapterById[q.ch];
     return `<span class="tag ${q.type === 'multi' ? 'amber' : ''}">${q.type === 'multi' ? '多选' : '单选'}</span>
       <span class="tag">${esc(q.mod)}</span>
-      <span class="tag">第${esc(q.ch)}章</span>
-      <span>${q.y} 年第 ${q.t} 题</span>`;
+      <span class="tag">${esc(chapterLabel(c))}</span>
+      ${withYear === false ? '' : `<span>${q.y} 年第 ${q.t} 题</span>`}`;
   }
 
   function fmtExp(text) {
@@ -348,7 +373,7 @@
       </div>
       <div class="card" style="padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">薄弱知识点</h3><span style="font-size:12px;color:var(--muted)">按正确率从低到高</span></div>
-        ${weak.length ? weak.map(x => `<div class="weak-row"><span>第${esc(x.c.ch)}章 ${esc(x.c.name)}</span><b>${x.st.acc}% · ${x.st.seen}/${x.c.count}</b></div>`).join('') : '<div style="padding:16px 0;color:var(--muted);font-size:13px">至少做 3 题后，这里会出现薄弱知识点。</div>'}
+        ${weak.length ? weak.map(x => `<div class="weak-row"><span>${esc(x.c.mod)} · ${esc(x.c.name)}</span><b>${x.st.acc}% · ${x.st.seen}/${x.c.count}</b></div>`).join('') : '<div style="padding:16px 0;color:var(--muted);font-size:13px">至少做 3 题后，这里会出现薄弱知识点。</div>'}
         <div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.9">规则：答错 → 明天复习；答对 → 按阶段往后推 1 / 3 / 7 / 15 / 30 天；连续答对 2 次自动移出错题本。</div>
       </div>`;
   }
@@ -428,7 +453,7 @@
       <div class="q-head">
         <span class="q-no">${String(q.t).padStart(2, '0')}</span>
         <span class="q-index">${q.y} 年 · 第 ${q.t} 题</span>
-        ${qTags(q)}
+        ${qTags(q, false)}
       </div>
       <p class="stem">${esc(q.stem)}</p>
       <div class="opts" id="opts">
@@ -591,7 +616,7 @@
     const lines = [`# 政治错题本`, '', `导出时间：${new Date().toLocaleString()}`, `共 ${ids.length} 题`, ''];
     ids.forEach((id, i) => {
       const q = byId[id], a = A(id);
-      lines.push(`## ${i + 1}. ${q.y} 年第 ${q.t} 题 · ${q.mod} · 第${q.ch}章`);
+      lines.push(`## ${i + 1}. ${q.y} 年第 ${q.t} 题 · ${q.mod} · ${chapterLabel(chapterById[q.ch])}`);
       lines.push('');
       lines.push(q.stem);
       lines.push('');
@@ -632,14 +657,14 @@
     }
     if (act === 'start-chapter') {
       const c = chapterById[b.dataset.ch];
-      if (c) startSession(c.ids, `第${c.ch}章 · ${c.name}`, 'chapter', { ch: c.ch });
+      if (c) startSession(c.ids, `${c.mod} · ${c.name}`, 'chapter', { ch: c.ch });
       return;
     }
     if (act === 'start-chapter-wrong') {
       const c = chapterById[b.dataset.ch];
       if (!c) return;
       const ids = c.ids.filter(id => { const a = A(id); return a.wrong && !a.mastered; });
-      startSession(ids, `第${c.ch}章 · 错题`, 'chapter-wrong', { ch: c.ch });
+      startSession(ids, `${c.mod} · 错题`, 'chapter-wrong', { ch: c.ch });
       return;
     }
     if (act === 'start-year') {
